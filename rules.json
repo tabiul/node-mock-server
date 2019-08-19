@@ -1,0 +1,14 @@
+[
+  {
+    "path": "/abc",
+    "body": "hello world",
+    "headers": [{"key": "content-type", "value": "text"}, {"key" : "abc", "value": "def"}],
+    "responseCode" : 200
+  },
+  {
+    "path": "/def",
+    "body": "hello world 2",
+    "headers": [{"key": "content-type", "value": "text"}, {"key" : "abc", "value": "def"}],
+    "responseCode" : 400
+  }	  
+]

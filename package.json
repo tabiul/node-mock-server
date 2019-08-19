@@ -1,0 +1,17 @@
+{
+  "name": "mock-http",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "dependencies": {
+    "@types/args": "^3.0.0",
+    "args": "^5.0.1",
+    "js-joda": "^1.9.2"
+  },
+  "devDependencies": {
+    "@types/node": "^10.12.12",
+    "typescript": "^3.0.1"
+  },
+  "author": "tabiul@gmail.com",
+  "license": "ISC"
+}
