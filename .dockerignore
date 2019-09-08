@@ -1,6 +1,7 @@
 Dockerfile
 .node_modules
 rules.json
+rules.toml
 .git
 *.sh
 

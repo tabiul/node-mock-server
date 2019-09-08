@@ -1,2 +1,6 @@
 node_modules
 *.sh
+*.toml
+*.d.ts
+*.js
+*.js.map

@@ -6,7 +6,8 @@
   "dependencies": {
     "@types/args": "^3.0.0",
     "args": "^5.0.1",
-    "js-joda": "^1.9.2"
+    "js-joda": "^1.9.2",
+    "toml": "^3.0.0"
   },
   "devDependencies": {
     "@types/node": "^10.12.12",

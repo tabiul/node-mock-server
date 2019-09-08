@@ -1,28 +1,30 @@
 import * as http from "http";
 import * as fs from "fs"
 import args from "args"
+import * as toml from "toml"
 
 args.option("port", "port to run", 9080)
-args.option("file", "path to the url matcher json file", "")
+args.option("file", "path to the url matcher toml file", "")
 
 interface KeyValue {
-  key: string,
-  value: string
+  [key: string]: string
+}
+interface RuleProperties {
+  responseCode: number,
+  headers?: KeyValue,
+  body?: string
 }
 interface Rule {
-  path: string,
-  responseCode: number,
-  headers?: [KeyValue],
-  body?: string
+  [key: string]: RuleProperties
 }
 
 const flags = args.parse(process.argv)
 
-let rules: Rule[] = []
+let rules: Rule = {}
 
 if (flags.file) {
   console.log(`reading rules file ${flags.file}`)
-  rules = JSON.parse(fs.readFileSync(flags.file, 'utf8'))
+  rules = toml.parse(fs.readFileSync(flags.file, 'utf8'))
 }
 
 let server = http.createServer((request, response) => {
@@ -45,29 +47,27 @@ process.on('SIGINT', () => {
 });
 
 let processRequest = function (requestUrl: String, response: http.ServerResponse) {
-  if (rules.length != 0) {
-    const rule = rules.find(d => {
-      const match = requestUrl.search(d.path)
-      if (match >= 0) {
-        return d
-      }
-    })
-    if (rule) {
-      console.log(`found matching rule ${rule.path}`)
-      if (rule.headers) {
-        rule.headers.forEach(kv => {
-          response.setHeader(kv.key, kv.value)
-        })
-      }
-      if (rule.responseCode) {
-        response.writeHead(rule.responseCode)
+  if (rules) {
+    for (let path in rules) {
+      console.log(`check rule ${path}`)
+      if (requestUrl.search(path) != -1) {
+        console.log(`found matching rule ${path}`)
+        if (rules[path].headers) {
+          for (let header in rules[path].headers) {
+            response.setHeader(header, rules[path].headers![header])
+          }
+        }
+        if (rules[path].responseCode) {
+          response.writeHead(rules[path].responseCode)
+        } else {
+          console.log('no response code, defaulting to Http 200')
+          response.writeHead(200)
+        }
+        if (rules[path].body) response.write(rules[path].body)
+        break
       } else {
-        console.log('no response code, defaulting to Http 200')
-        response.writeHead(200)
+        console.log("rule was not matched")
       }
-      if (rule.body) response.write(rule.body)
-    } else {
-      console.log("no rule was matched")
     }
     response.end()
   } else {

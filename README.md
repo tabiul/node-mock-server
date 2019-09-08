@@ -6,6 +6,28 @@ It `console.log` all requests received including the body. An optional rules fil
 
 ### Rule File
 
+Two types of rules file is supported
+
+* json (v1.0.0)
+* [toml](https://github.com/toml-lang/toml) (v2.0.0)
+
+The advantage of using **toml** is that it support multilines without escaping. It is recommened to use **toml** format unless you love json and escaping too much :).
+
+#### Toml format (Supported in v2.0.0)
+
+```
+  ["/a/b/c"] # the path
+  body = '''
+     {"text": "I love toml"}
+  '''
+  headers = {content-type = "application/json"}
+  responseCode = 200
+
+  ["a/b/d"] # another path    
+```
+
+
+#### Json Format (Only supported in v1.0.0)
 The rule file is a simple json file that has the following fields.
 
 * path - specify the path for the rule. The mock server will use simple `String.find` to see if the request path matches and if it does then the specific entry will be used. No fancy regex at the moment.
@@ -38,7 +60,8 @@ No validation is done for the rules file. Sample rule file
 
 ### Running
 
-`docker pull tabiul/node-mock-server:latest`
+`docker pull tabiul/node-mock-server:v1.0.0` (json)
+`docker pull tabiul/node-mock-server:v2.0.0` (toml)
 
 The server takes the following arguments
 
@@ -47,4 +70,6 @@ The server takes the following arguments
 
 #### Running in docker
 
-`docker run -it -p 9080:9080 -v /path/to/rules.json:/rules.json node-mock-server:latest -f /rules.json`
+`docker run -it -p 9080:9080 -v /path/to/rules.json:/rules.json node-mock-server:v1.0.0 -f /rules.json` (json)
+
+`docker run -it -p 9080:9080 -v /path/to/rules.toml:/rules.toml node-mock-server:v2.0.0 -f /rules.toml` (toml)
