@@ -24,7 +24,7 @@ const flags = args.parse(process.argv)
 const info = chalk.green
 const error = chalk.red.bold
 const warn = chalk.yellow
-const nestedNextLine =  ansiEscapes.cursorNextLine + ansiEscapes.cursorForward(2)
+const nestedNextLine = ansiEscapes.cursorNextLine + ansiEscapes.cursorForward(2)
 
 let rules: Rule = {}
 
