@@ -32,7 +32,11 @@ let rules: Rule = {}
 
 if (flags.file) {
   console.log(info(`reading rules file ${flags.file}`))
-  rules = toml.parse(fs.readFileSync(flags.file, 'utf8'))
+  try {
+    rules = toml.parse(fs.readFileSync(flags.file, 'utf8'))
+  } catch (e) {
+    console.log(error(`Parsing error on line ${e.line}:${e.column}: ${e.message}`))
+  }
 }
 
 const server = http.createServer((request, response) => {
