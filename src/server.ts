@@ -56,9 +56,7 @@ const server = http.createServer((request, response) => {
   })
 });
 
-process.on('SIGINT', () => {
-  process.exit();
-});
+process.on('SIGINT', () => process.exit());
 
 const processRequest = (requestUrl: String, response: http.ServerResponse) => {
   if (!rules) {
@@ -96,5 +94,5 @@ const processRequest = (requestUrl: String, response: http.ServerResponse) => {
   response.end()
 }
 
-console.log(info('starting server on port: %d'), flags.port)
+console.log(info(`starting server on port: ${flags.port}`))
 server.listen(flags.port);
