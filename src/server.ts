@@ -9,15 +9,17 @@ args.option("port", "port to run", 9080)
 args.option("file", "path to the url matcher toml file", "")
 
 interface KeyValue {
-  [key: string]: string
+  readonly [key: string]: string
 }
+
 interface RuleProperties {
-  responseCode: number,
-  headers?: KeyValue,
-  body?: string
+  readonly responseCode: number
+  readonly headers?: KeyValue
+  readonly body?: string
 }
+
 interface Rule {
-  [key: string]: RuleProperties
+  readonly [key: string]: RuleProperties
 }
 
 const flags = args.parse(process.argv)
@@ -30,10 +32,14 @@ let rules: Rule = {}
 
 if (flags.file) {
   console.log(info(`reading rules file ${flags.file}`))
-  rules = toml.parse(fs.readFileSync(flags.file, 'utf8'))
+  try {
+    rules = toml.parse(fs.readFileSync(flags.file, 'utf8'))
+  } catch (e) {
+    console.log(error(`Parsing error on line ${e.line}:${e.column}: ${e.message}`))
+  }
 }
 
-let server = http.createServer((request, response) => {
+const server = http.createServer((request, response) => {
 
   let path = request.url as string
   console.log(ansiEscapes.cursorNextLine)
@@ -50,42 +56,43 @@ let server = http.createServer((request, response) => {
   })
 });
 
-process.on('SIGINT', () => {
-  process.exit();
-});
+process.on('SIGINT', () => process.exit());
 
-let processRequest = function (requestUrl: String, response: http.ServerResponse) {
-  if (rules) {
-    console.log(ansiEscapes.cursorNextLine)
-    for (let path in rules) {
-      console.log(info(`check rule ${path}`))
-      if (requestUrl.search(path) != -1) {
-        console.log(nestedNextLine + info(`found matching rule ${path}`))
-        if (rules[path].headers) {
-          for (let header in rules[path].headers) {
-            response.setHeader(header, rules[path].headers![header])
-          }
-        }
-        if (rules[path].responseCode) {
-          response.writeHead(rules[path].responseCode)
-        } else {
-          console.log(nestedNextLine + warn('no response code, defaulting to Http 200'))
-          response.writeHead(200)
-        }
-        if (rules[path].body) response.write(rules[path].body)
-        break
-      } else {
-        console.log(nestedNextLine + warn("rule was not matched"))
-      }
-      console.log(ansiEscapes.cursorNextLine)
-    }
-    response.end()
-  } else {
+const processRequest = (requestUrl: String, response: http.ServerResponse) => {
+  if (!rules) {
     console.log(warn('no rules defined, responding with Http 200'))
     response.writeHead(200)
     response.end()
+    return
   }
+
+  console.log(ansiEscapes.cursorNextLine)
+  const path = Object.keys(rules).find(rulePath => requestUrl.search(rulePath) != -1)
+  if (path) {
+    console.log(nestedNextLine + info(`found matching rule ${path}`))
+    const rule = rules[path]
+
+    if (rule.headers) {
+      Object.entries(rule.headers).forEach(([header, value]) => response.setHeader(header, value))
+    }
+
+    if (rule.responseCode) {
+      response.writeHead(rule.responseCode)
+    } else {
+      console.log(nestedNextLine + warn('no response code, defaulting to Http 200'))
+      response.writeHead(200)
+    }
+
+    if (rule.body) {
+      response.write(rule.body)
+    }
+  } else {
+    console.log(nestedNextLine + warn("rule was not matched"))
+  }
+  console.log(ansiEscapes.cursorNextLine)
+
+  response.end()
 }
 
-console.log(chalk.green('starting server on port: %d'), flags.port)
+console.log(info(`starting server on port: ${flags.port}`))
 server.listen(flags.port);

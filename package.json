@@ -3,6 +3,16 @@
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
+  "repository": {
+    "type": "github",
+    "url": "https://github.com/tabiul/node-mock-server"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "npm run build && npm run server",
+    "server": "node dist/server.js",
+    "postinstall": "npm run build"
+  },
   "dependencies": {
     "@types/args": "^3.0.0",
     "ansi-escapes": "^4.2.1",
