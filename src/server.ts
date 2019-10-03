@@ -9,17 +9,17 @@ args.option("port", "port to run", 9080)
 args.option("file", "path to the url matcher toml file", "")
 
 interface KeyValue {
-  [key: string]: string
+  readonly [key: string]: string
 }
 
 interface RuleProperties {
-  responseCode: number
-  headers?: KeyValue
-  body?: string
+  readonly responseCode: number
+  readonly headers?: KeyValue
+  readonly body?: string
 }
 
 interface Rule {
-  [key: string]: RuleProperties
+  readonly [key: string]: RuleProperties
 }
 
 const flags = args.parse(process.argv)

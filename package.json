@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
+  "repository": {
+    "type": "github",
+    "url": "https://github.com/tabiul/node-mock-server"
+  },
   "scripts": {
     "build": "tsc",
     "start": "npm run build && npm run server",
