@@ -19,7 +19,7 @@
     "args": "^5.0.1",
     "chalk": "^2.4.2",
     "js-joda": "^1.9.2",
-    "toml": "^3.0.0"
+    "toml": "^4.2.0"
   },
   "devDependencies": {
     "@types/node": "^10.12.12",
